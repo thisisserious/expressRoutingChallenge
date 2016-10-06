@@ -1,16 +1,21 @@
 var express = require('express'); //require the express library
 var bodyParser = require('body-parser'); //require the body parser module
 var path = require('path');
+var songRouter = require('./routes/songs');
 
 var app = express(); //create a new application
+
+app.use(bodyParser.urlencoded({ extended: true })); // returns a function that knows how to take a request, find any url body params & turn it into a js object
+//need to use extended mode; have to use bodyParser first
+
+app.use('/songs', songRouter);
 
 app.use(function (req, res, next) { // used to explain the bodyParser section
   console.log('Got a request!');
   next();
 });
 
-app.use(bodyParser.urlencoded({ extended: true })); // returns a function that knows how to take a request, find any url body params & turn it into a js object
-//need to use extended mode
+
 
 app.post('/', function (req, res) {//HAS to come after bodyParser
   console.log('req.body=', req.body);
@@ -34,17 +39,10 @@ app.get('/kittens', function(req, res) {
   }
 });
 
-var songs = []; //declare outside the handler function; want to use the same array every time (that's why it's outside function)
-app.post('/songs', function(req, res) {
-  console.log('req.body:', req.body);
-  songs.push(req.body);
-  console.log('songs', songs);
-  res.sendStatus(200);
-});
 
-app.get('/songs', function (req, res) {
-  res.send(songs);
-});
+// declare outside the handler function; want to use the same
+//array every time (that's why it's outside function)
+
 
 //middleware for serving static files (which are any files that don't change while the server is running)
 app.use(express.static('public')); //whatever directory you run node in, this path needs to be relevant to that
